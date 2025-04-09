@@ -5,11 +5,22 @@
 import java.util.List;
 
 public class Parser {
+	private static class ParseError extends RuntimeException {
+	}
+
 	private final List<Token> tokens;
 	private int current = 0;
 
 	public Parser(List<Token> tokens) {
 		this.tokens = tokens;
+	}
+
+	Expr parse() {
+		try {
+			return expression();
+		} catch (ParseError error) {
+			return null;
+		}
 	}
 
 	private Expr expression() {
@@ -92,6 +103,8 @@ public class Parser {
 			consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
 			return new Expr.Grouping(expr);
 		}
+
+		throw error(peek(), "Expected expression.");
 	}
 
 	private boolean match(TokenType... types) {
@@ -137,4 +150,34 @@ public class Parser {
 	private Token previous() {
 		return tokens.get(current - 1);
 	}
+
+	private ParserError error(Token token, String message) {
+		lox.error(token, message);
+		return new ParserError();
+	}
+
+	private void synchronize() {
+		advance();
+
+		while (!isAtEnd()) {
+			if (previous().type == TokenType.SEMICOLON) {
+				return;
+			}
+
+			switch (peek().type) {
+				case TokenType.CLASS:
+				case TokenType.FUN:
+				case TokenType.VAR:
+				case TokenType.FOR:
+				case TokenType.IF:
+				case TokenType.WHILE:
+				case TokenType.PRINT:
+				case TokenType.RETURN:
+					return;
+			}
+
+			advance();
+		}
+	}
+
 }
