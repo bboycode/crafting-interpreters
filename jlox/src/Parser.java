@@ -151,9 +151,9 @@ public class Parser {
 		return tokens.get(current - 1);
 	}
 
-	private ParserError error(Token token, String message) {
+	private ParseError error(Token token, String message) {
 		lox.error(token, message);
-		return new ParserError();
+		return new ParseError();
 	}
 
 	private void synchronize() {
