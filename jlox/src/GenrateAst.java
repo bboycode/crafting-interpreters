@@ -1,3 +1,5 @@
+package src;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -16,11 +18,10 @@ public class GenrateAst {
 
 		String outputDir = args[0];
 		defineAst(outputDir, "Expr", Arrays.asList(
-			"Binary   : Expr left, Token operator, Expr right",
-			"Grouping : Expr expression",
-			"Literal  : Object value",
-			"Unary    : Token operator, Expr right"
-		));
+				"Binary   : Expr left, Token operator, Expr right",
+				"Grouping : Expr expression",
+				"Literal  : Object value",
+				"Unary    : Token operator, Expr right"));
 	}
 
 	private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
@@ -38,7 +39,7 @@ public class GenrateAst {
 			String className = type.split(":")[0].trim();
 			String fields = type.split(":")[1].trim();
 			defineType(writer, baseName, className, fields);
-			
+
 		}
 
 		// The base accept() method.
@@ -53,12 +54,12 @@ public class GenrateAst {
 
 		writer.println("  interface Visitor<R> {");
 
-		for (String type: types) {
+		for (String type : types) {
 
 			String typeName = type.split(":")[0].trim();
-			 writer.println("    R visit" + typeName + baseName + "(" +
-				typeName + " " + baseName.toLowerCase() + ");");
-			
+			writer.println("    R visit" + typeName + baseName + "(" +
+					typeName + " " + baseName.toLowerCase() + ");");
+
 		}
 
 		writer.println("  }");
@@ -77,9 +78,9 @@ public class GenrateAst {
 
 			String name = field.split(" ")[1];
 			writer.println("      this." + name + " = " + name + ";");
-			
+
 		}
-		
+
 		writer.println("    }");
 
 		// Visitor pattern.
@@ -87,15 +88,15 @@ public class GenrateAst {
 		writer.println("    @Override");
 		writer.println("    <R> R accept(Visitor<R> visitor) {");
 		writer.println("      return visitor.visit" +
-		className + baseName + "(this);");
+				className + baseName + "(this);");
 		writer.println("    }");
 
-		//Fields
+		// Fields
 		writer.println();
 		for (String field : fields) {
 
 			writer.println("    final " + field + ";");
-			
+
 		}
 
 		writer.println("  }");

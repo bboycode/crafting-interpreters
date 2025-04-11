@@ -1,3 +1,5 @@
+package src;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class lox {
+	private static final Interpreter interpreter = new Interpreter();
+	static boolean hadRuntimeError = false;
 	static boolean hadError = false;
 
 	public static void main(String[] args) throws IOException {
@@ -30,6 +34,10 @@ public class lox {
 
 		if (hadError) {
 			System.exit(65);
+		}
+
+		if (hadRuntimeError) {
+			System.exit(70);
 		}
 
 	}
@@ -69,12 +77,17 @@ public class lox {
 			return;
 		}
 
-		System.out.println(new AstPrinter().print(experssion));
-
+		interpreter.interpret(experssion);
 	}
 
 	static void error(int line, String message) {
 		report(line, "", message);
+	}
+
+	static void runtimeError(RuntimeError error) {
+		System.err.println(error.getMessage() +
+				"\n[line " + error.token.line + "]");
+		hadRuntimeError = true;
 	}
 
 	private static void report(int line, String where, String message) {
