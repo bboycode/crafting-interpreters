@@ -7,7 +7,7 @@ SRC_DIR = src
 BIN_DIR = bin
 
 # Main class (no .class or .java extension)
-MAIN_CLASS = lox
+MAIN_CLASS = src.lox
 
 # All Java source files
 SOURCES := $(shell find $(SRC_DIR) -name "*.java")
