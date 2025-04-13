@@ -7,6 +7,18 @@ import java.util.List;
  */
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+	private Environment environment = new Environment();
+
+	void interpret(List<Stmt> statements) {
+		try {
+			for (Stmt statement : statements) {
+				execute(statement);
+			}
+		} catch (RuntimeError error) {
+			lox.runtimeError(error);
+		}
+	}
+
 	// Evals strings literals.
 	@Override
 	public Object visitLiteralExpr(Expr.Literal expr) {
@@ -41,6 +53,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	@Override
+	public Void visitVarStmt(Stmt.Var stmt) {
+		Object value = null;
+		if (stmt.initializer != null) {
+			value = evaluate(stmt.initializer);
+		}
+
+		environment.define(stmt.name.lexeme, value);
+		return null;
+	}
+
+	@Override
 	public Object visitUnaryExpr(Expr.Unary expr) {
 		Object right = evaluate(expr.right);
 
@@ -54,6 +77,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 		// Unreachable.
 		return null;
+	}
+
+	@Override
+	public Object visitVariableExpr(Expr.Variable expr) {
+		return environment.get(expr.name);
 	}
 
 	@Override
@@ -138,16 +166,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		}
 
 		throw new RuntimeError(operator, "Operands must be numbers.");
-	}
-
-	void interpret(List<Stmt> statements) {
-		try {
-			for (Stmt statement : statements) {
-				execute(statement);
-			}
-		} catch (RuntimeError error) {
-			lox.runtimeError(error);
-		}
 	}
 
 	private String stringify(Object object) {
