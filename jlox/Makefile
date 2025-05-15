@@ -9,8 +9,8 @@ BIN_DIR = bin
 # Main class (no .class or .java extension)
 MAIN_CLASS = src.lox
 
-# All Java source files
-SOURCES := $(shell find $(SRC_DIR) -name "*.java")
+# All Java source files, excluding AstPrinter.java
+SOURCES := $(shell find $(SRC_DIR) -name "*.java" ! -name "AstPrinter.java")
 
 # Default target: compile everything at once
 all:
